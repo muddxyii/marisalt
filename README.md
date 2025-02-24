@@ -18,7 +18,7 @@ This project is licensed under the GNU General Public License v3.0 -
  see the [LICENSE](LICENSE.txt) file for details.
 
 ## Contact
-Email [me](contact@nikolaspadilla.com) with any questions or suggestions.
+Email: [contact@nikolaspadilla.com](mailto:contact@nikolaspadilla.com)
 
 ## Acknowledgements
 - [Ebitengine](https://ebitengine.org/) - The game engine powering Marisalt
