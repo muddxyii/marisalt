@@ -103,6 +103,7 @@ func (p *Player) GetBounds() (float32, float32, float32, float32) {
 	return p.pos.X, p.pos.Y, p.width, p.height
 }
 
-func (p *Player) Draw(screen *ebiten.Image) {
-	p.sprite.Draw(screen, p.pos)
+func (p *Player) Draw(screen *ebiten.Image, camera *Camera) {
+	spritePos := p.pos.Sub(camera.Position)
+	p.sprite.Draw(screen, spritePos)
 }

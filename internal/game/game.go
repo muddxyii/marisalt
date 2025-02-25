@@ -16,6 +16,7 @@ type WorldCollider interface {
 type Game struct {
 	assets                *asset.Manager
 	player                *Player
+	camera                *Camera
 	gridWidth, gridHeight int
 	tileSize              int
 	tileMap               [][]Tile
@@ -36,6 +37,7 @@ func (g *Game) IsPositionWalkable(vector2 vec.Vector2) bool {
 func NewGame() *Game {
 	g := &Game{
 		assets:     asset.NewAssetManager(),
+		camera:     NewCamera(),
 		gridWidth:  20,
 		gridHeight: 11,
 		tileSize:   32,
@@ -69,6 +71,10 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 func (g *Game) Update() error {
 	dt := 1.0 / 60.0
 	g.player.Update(dt)
+
+	screenWidth, screenHeight := g.Layout(0, 0)
+	g.camera.Update(g.player.pos, screenWidth, screenHeight)
+
 	return nil
 }
 
@@ -79,8 +85,8 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	for y := 0; y < g.gridHeight; y++ {
 		for x := 0; x < g.gridWidth; x++ {
 			tile := g.tileMap[y][x]
-			x1 := float32(x * g.tileSize)
-			y1 := float32(y * g.tileSize)
+			x1 := float32(x*g.tileSize) - g.camera.Position.X
+			y1 := float32(y*g.tileSize) - g.camera.Position.Y
 
 			switch tile.Type {
 			case TileWall:
@@ -97,7 +103,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		}
 	}
 
-	g.player.Draw(screen)
+	g.player.Draw(screen, g.camera)
 }
 
 func (g *Game) IsSolidTileAt(vec2 vec.Vector2) bool {
