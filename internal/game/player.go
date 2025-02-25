@@ -15,9 +15,10 @@ type Player struct {
 	sprite        *asset.Sprite
 	isMoving      bool
 	tileSize      float32
+	collider      WorldCollider
 }
 
-func NewPlayer(assets *asset.Manager) *Player {
+func NewPlayer(assets *asset.Manager, collider WorldCollider) *Player {
 	spriteImage, err := assets.LoadImage("human-8px.png")
 	if err != nil {
 		panic(err)
@@ -35,7 +36,12 @@ func NewPlayer(assets *asset.Manager) *Player {
 		sprite:    sprite,
 		isMoving:  false,
 		tileSize:  32,
+		collider:  collider,
 	}
+}
+
+func (p *Player) canMoveTo(newPos vec.Vector2) bool {
+	return p.collider.IsPositionWalkable(newPos)
 }
 
 func (p *Player) handleInput() {
@@ -55,31 +61,45 @@ func (p *Player) handleInput() {
 	}
 
 	if moveDir.X != 0 || moveDir.Y != 0 {
-		p.targetPos = p.pos.Add(moveDir)
-		p.isMoving = true
+		newPos := p.pos.Add(moveDir)
+		if p.canMoveTo(newPos) {
+			p.targetPos = newPos
+			p.isMoving = true
+		}
 	}
+
 }
 
 func (p *Player) Update(dt float64) {
 	p.handleInput()
 
-	// If we're moving, interpolate towards the target position
 	if p.isMoving {
 		moveVector := p.targetPos.Sub(p.pos)
 		distance := moveVector.Length()
 
-		if distance < 1 { // We've basically reached the target
+		if distance < 1 {
 			p.pos = p.targetPos
 			p.isMoving = false
 		} else {
-			// Move towards target
 			moveDir := moveVector.Normalized()
 			movement := moveDir.Mul(p.speed)
-			p.pos = p.pos.Add(movement)
+			newPos := p.pos.Add(movement)
+
+			if p.canMoveTo(newPos) {
+				p.pos = newPos
+			} else {
+				p.pos = p.targetPos
+				p.isMoving = false
+			}
+
 		}
 	}
 
 	p.sprite.Update(dt)
+}
+
+func (p *Player) GetBounds() (float32, float32, float32, float32) {
+	return p.pos.X, p.pos.Y, p.width, p.height
 }
 
 func (p *Player) Draw(screen *ebiten.Image) {
