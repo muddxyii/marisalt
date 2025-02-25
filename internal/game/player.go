@@ -2,6 +2,7 @@ package game
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	_ "image/png"
 	"marisalt/internal/asset"
 	"marisalt/internal/vec"
@@ -50,13 +51,13 @@ func (p *Player) handleInput() {
 	}
 
 	var moveDir vec.Vector2
-	if ebiten.IsKeyPressed(ebiten.KeyW) {
+	if inpututil.IsKeyJustPressed(ebiten.KeyW) || inpututil.IsKeyJustPressed(ebiten.KeyUp) {
 		moveDir = vec.New(0, -p.tileSize)
-	} else if ebiten.IsKeyPressed(ebiten.KeyS) {
+	} else if inpututil.IsKeyJustPressed(ebiten.KeyS) || inpututil.IsKeyJustPressed(ebiten.KeyDown) {
 		moveDir = vec.New(0, p.tileSize)
-	} else if ebiten.IsKeyPressed(ebiten.KeyD) {
+	} else if inpututil.IsKeyJustPressed(ebiten.KeyD) || inpututil.IsKeyJustPressed(ebiten.KeyRight) {
 		moveDir = vec.New(p.tileSize, 0)
-	} else if ebiten.IsKeyPressed(ebiten.KeyA) {
+	} else if inpututil.IsKeyJustPressed(ebiten.KeyA) || inpututil.IsKeyJustPressed(ebiten.KeyLeft) {
 		moveDir = vec.New(-p.tileSize, 0)
 	}
 
