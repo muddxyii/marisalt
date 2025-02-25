@@ -14,6 +14,7 @@ type Manager struct {
 }
 
 func NewAssetManager() *Manager {
+	// TODO: Handle getting assets from mac bundle
 	// Get the directory of the current file
 	_, filename, _, _ := runtime.Caller(0)
 	// Navigate to project root/assets directory
