@@ -24,7 +24,8 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 }
 
 func (g *Game) Update() error {
-	g.player.HandleInput()
+	dt := 1.0 / 60.0
+	g.player.Update(dt)
 	return nil
 }
 
