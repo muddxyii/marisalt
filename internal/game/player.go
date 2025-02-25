@@ -9,9 +9,12 @@ import (
 
 type Player struct {
 	pos           vec.Vector2
+	targetPos     vec.Vector2
 	speed         float32
 	width, height float32
 	sprite        *asset.Sprite
+	isMoving      bool
+	tileSize      float32
 }
 
 func NewPlayer(assets *asset.Manager) *Player {
@@ -24,37 +27,59 @@ func NewPlayer(assets *asset.Manager) *Player {
 	sprite.AddAnimation("idle", 2, 0.5)
 
 	return &Player{
-		pos:    vec.New(100, 100),
-		speed:  8,
-		width:  32,
-		height: 32,
-		sprite: sprite,
+		pos:       vec.New(100, 100),
+		targetPos: vec.New(100, 100),
+		speed:     8,
+		width:     32,
+		height:    32,
+		sprite:    sprite,
+		isMoving:  false,
+		tileSize:  32,
+	}
+}
+
+func (p *Player) handleInput() {
+	if p.isMoving {
+		return
+	}
+
+	var moveDir vec.Vector2
+	if ebiten.IsKeyPressed(ebiten.KeyW) {
+		moveDir = vec.New(0, -p.tileSize)
+	} else if ebiten.IsKeyPressed(ebiten.KeyS) {
+		moveDir = vec.New(0, p.tileSize)
+	} else if ebiten.IsKeyPressed(ebiten.KeyD) {
+		moveDir = vec.New(p.tileSize, 0)
+	} else if ebiten.IsKeyPressed(ebiten.KeyA) {
+		moveDir = vec.New(-p.tileSize, 0)
+	}
+
+	if moveDir.X != 0 || moveDir.Y != 0 {
+		p.targetPos = p.pos.Add(moveDir)
+		p.isMoving = true
 	}
 }
 
 func (p *Player) Update(dt float64) {
 	p.handleInput()
+
+	// If we're moving, interpolate towards the target position
+	if p.isMoving {
+		moveVector := p.targetPos.Sub(p.pos)
+		distance := moveVector.Length()
+
+		if distance < 1 { // We've basically reached the target
+			p.pos = p.targetPos
+			p.isMoving = false
+		} else {
+			// Move towards target
+			moveDir := moveVector.Normalized()
+			movement := moveDir.Mul(p.speed)
+			p.pos = p.pos.Add(movement)
+		}
+	}
+
 	p.sprite.Update(dt)
-}
-
-func (p *Player) handleInput() {
-	vel := vec.Vector2Zero()
-
-	if ebiten.IsKeyPressed(ebiten.KeyW) {
-		vel.Y -= p.speed
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyS) {
-		vel.Y += p.speed
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyD) {
-		vel.X += p.speed
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyA) {
-		vel.X -= p.speed
-	}
-
-	vel.Normalize()
-	p.pos.Add(vel)
 }
 
 func (p *Player) Draw(screen *ebiten.Image) {
