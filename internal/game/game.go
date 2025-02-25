@@ -2,7 +2,6 @@ package game
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/vector"
 	"image/color"
 	"marisalt/internal/asset"
@@ -17,6 +16,7 @@ type Game struct {
 	assets                *asset.Manager
 	player                *Player
 	camera                *Camera
+	crosshair             *Crosshair
 	gridWidth, gridHeight int
 	tileSize              int
 	tileMap               [][]Tile
@@ -61,6 +61,7 @@ func NewGame() *Game {
 
 	// Pass the game as a WorldCollider
 	g.player = NewPlayer(g.assets, g)
+	g.crosshair = NewCrosshair(g.assets)
 	return g
 }
 
@@ -73,15 +74,13 @@ func (g *Game) Update() error {
 	g.player.Update(dt)
 
 	screenWidth, screenHeight := g.Layout(0, 0)
-	g.camera.Update(g.player.pos, screenWidth, screenHeight)
+	g.camera.Update(g.player.pos, screenWidth, screenHeight, g.tileSize)
+	g.crosshair.Update(g.tileSize, g.camera, dt)
 
 	return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	ebitenutil.DebugPrint(screen, "Hello, World!\n"+
-		"Get ready to play Marisalt! >:)")
-
 	for y := 0; y < g.gridHeight; y++ {
 		for x := 0; x < g.gridWidth; x++ {
 			tile := g.tileMap[y][x]
@@ -104,6 +103,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	}
 
 	g.player.Draw(screen, g.camera)
+	g.crosshair.Draw(screen, g.camera)
 }
 
 func (g *Game) IsSolidTileAt(vec2 vec.Vector2) bool {

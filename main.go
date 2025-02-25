@@ -8,6 +8,7 @@ import (
 
 func main() {
 	ebiten.SetWindowSize(1280, 720)
+	ebiten.SetCursorMode(ebiten.CursorModeHidden)
 	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
 	ebiten.SetWindowTitle("Marisalt: A Dark Fantasy Pirate Role Playing Game")
 

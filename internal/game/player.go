@@ -10,6 +10,7 @@ import (
 
 type Player struct {
 	pos           vec.Vector2
+	worldPos      vec.Vector2
 	targetPos     vec.Vector2
 	speed         float32
 	width, height float32
@@ -20,7 +21,7 @@ type Player struct {
 }
 
 func NewPlayer(assets *asset.Manager, collider WorldCollider) *Player {
-	spriteImage, err := assets.LoadImage("human-8px.png")
+	spriteImage, err := assets.LoadImage("entities/human-8px.png")
 	if err != nil {
 		panic(err)
 	}
@@ -104,6 +105,6 @@ func (p *Player) GetBounds() (float32, float32, float32, float32) {
 }
 
 func (p *Player) Draw(screen *ebiten.Image, camera *Camera) {
-	spritePos := p.pos.Sub(camera.Position)
-	p.sprite.Draw(screen, spritePos)
+	p.worldPos = p.pos.Sub(camera.Position)
+	p.sprite.Draw(screen, p.worldPos, nil)
 }

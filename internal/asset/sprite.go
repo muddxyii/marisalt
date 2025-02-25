@@ -44,7 +44,7 @@ func (s *Sprite) Update(dt float64) {
 	}
 }
 
-func (s *Sprite) Draw(screen *ebiten.Image, pos vec.Vector2) {
+func (s *Sprite) Draw(screen *ebiten.Image, pos vec.Vector2, color *ebiten.ColorScale) {
 	anim, exists := s.animations[s.currentAnim]
 	if !exists {
 		return
@@ -53,6 +53,11 @@ func (s *Sprite) Draw(screen *ebiten.Image, pos vec.Vector2) {
 	op := &ebiten.DrawImageOptions{}
 	op.GeoM.Scale(s.scale, s.scale)
 	op.GeoM.Translate(float64(pos.X), float64(pos.Y))
+
+	// Apply color if provided
+	if color != nil {
+		op.ColorScale = *color
+	}
 
 	sx := anim.CurrentFrame * s.frameWidth
 	sy := 0
