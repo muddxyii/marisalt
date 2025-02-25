@@ -27,8 +27,8 @@ func NewPlayer(assets *asset.Manager) *Player {
 	sprite.AddAnimation("idle", 2, 0.5)
 
 	return &Player{
-		pos:       vec.New(100, 100),
-		targetPos: vec.New(100, 100),
+		pos:       vec.New(64, 64),
+		targetPos: vec.New(64, 64),
 		speed:     8,
 		width:     32,
 		height:    32,
