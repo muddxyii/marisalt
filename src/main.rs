@@ -11,28 +11,28 @@ struct Camera;
 
 fn main() {
     App::new()
-        .add_plugins(DefaultPlugins)
+        .add_plugins(DefaultPlugins.set(WindowPlugin {
+            primary_window: Some(Window {
+                title: "Marisalt: A Dark Fantasy Pirate Role Playing Game".to_string(),
+                ..default()
+            }),
+            ..default()
+        }))
         .add_systems(Startup, setup)
         .add_systems(Update, player_movement)
         .run();
 }
 
-fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
+fn setup(mut commands: Commands) {
     // Spawn a 2D camera
     commands.spawn((Camera2d::default(), Camera));
 
     // Spawn the player
     commands.spawn((
         Sprite {
-            image: asset_server.load("player.png"),
-            texture_atlas: None,
             color: Default::default(),
-            flip_x: false,
-            flip_y: false,
-            custom_size: None,
-            rect: None,
-            anchor: Default::default(),
-            image_mode: Default::default(),
+            custom_size: Some(Vec2::new(50.0, 50.0)),
+            ..default()
         },
         Transform {
             translation: Vec3::new(0.0, 0.0, 1.0),
