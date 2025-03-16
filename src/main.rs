@@ -19,7 +19,7 @@ fn main() {
             ..default()
         }))
         .add_systems(Startup, setup)
-        .add_systems(Update, player_movement)
+        .add_systems(Update, (camera_follow, player_movement))
         .run();
 }
 
@@ -41,6 +41,34 @@ fn setup(mut commands: Commands) {
         },
         Player { speed: 150.0 },
     ));
+
+    // Spawn a yellow building placeholder
+    commands.spawn((
+        Sprite {
+            color: Color::linear_rgba(1.0, 0.8, 0.2, 0.5),
+            custom_size: Some(Vec2::new(100.0, 100.0)),
+            ..default()
+        },
+        Transform {
+            translation: Vec3::new(200.0, 200.0, 0.0),
+            ..default()
+        },
+    ));
+}
+
+fn camera_follow(
+    player_query: Query<&Transform, With<Player>>,
+    mut camera_query: Query<&mut Transform, (With<Camera>, Without<Player>)>,
+    time: Res<Time>,
+) {
+    if let Ok(player_transform) = player_query.get_single() {
+        if let Ok(mut camera_transform) = camera_query.get_single_mut() {
+            let lerp_speed = 5.0;
+            camera_transform.translation = camera_transform
+                .translation
+                .lerp(player_transform.translation, lerp_speed * time.delta_secs());
+        }
+    }
 }
 
 fn player_movement(
